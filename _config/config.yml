@@ -1,0 +1,3 @@
+ContentController:
+  extensions:
+    - MobileMenu_ContentControllerExtension
