@@ -5,14 +5,19 @@
 var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
 {
 
+    /* Elements: Dynamic */
     this.triggerElement = document.getElementById(menuTriggerID);
     this.menuElement = document.getElementById(menuContainerID);
-    this.menuOpenClass = menuOpenClass !== null ? menuOpenClass : 'menu-open';
-    this.closeTriggerElement = document.getElementById('close-menu');
 
+    /* Elements: Static */
+    this.closeTriggerElement = document.getElementById('close-menu');
     this.childMenuTriggers = document.getElementsByClassName('child-menu-trigger');
     this.closeMenuTriggers = document.getElementsByClassName('close-menu-trigger');
     this.subMenus = document.getElementsByClassName('sub-menu');
+
+    /* Classes */
+    this.menuOpenClass = menuOpenClass !== null ? menuOpenClass : 'menu-open';
+
 
     this.resetMenu = function(){
 
