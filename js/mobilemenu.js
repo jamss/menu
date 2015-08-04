@@ -27,6 +27,30 @@ var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
         }
     }
 
+    /*this.createEvents = function(){
+
+        var menuOpenEvent, menuCloseEvent;
+
+        if(document.createEvent){
+
+            menuOpenEvent = document.createEvent('HTMLEvents');
+            menuOpenEvent.initEvent('MobileMenuOpen', true, true);
+
+            menuCloseEvent = document.createEvent('HTMLEvents');
+            menuCloseEvent.initEvent('MobileMenuClose', true, true);
+
+        }else{
+
+            menuOpenEvent = document.createEventObject();
+            menuOpenEvent.eventType = 'MobileMenuOpen';
+
+            menuCloseEvent = document.createEventObject();
+            menuCloseEvent.eventType = 'MobileMenuClose';
+
+        }
+
+    }*/
+
     this.bindEvents = function(){
 
         if(typeof this.triggerElement === 'undefined'){
@@ -43,9 +67,11 @@ var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
             if(_this.menuElement.classList.contains(_this.menuOpenClass))
             {
                 //never executes
+                _this.fireEvent('MobileMenuClose');
                 _this.menuElement.classList.remove(_this.menuOpenClass);
                 _this.resetMenu();
             }else{
+                _this.fireEvent('MobileMenuOpen');
                 _this.menuElement.classList.add(_this.menuOpenClass);
             }
 
@@ -53,11 +79,13 @@ var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
 
         this.closeTriggerElement.addEventListener('click', function(){
 
+            _this.fireEvent('MobileMenuClose');
+
             if(_this.menuElement.classList.contains(_this.menuOpenClass))
             {
-                /* WHY DOES THIS WORK */
+                /* todo: why this always executes */
+                _this.fireEvent('MobileMenuOpen');
                 _this.menuElement.classList.add(_this.menuOpenClass);
-                _this.resetMenu();
             }else{
                 //never executes
                 _this.menuElement.classList.remove(_this.menuOpenClass);
@@ -118,6 +146,24 @@ var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
         });
 
     };
+
+    this.fireEvent = function(eventName){
+
+        console.log('dispatching: ' + 'on' + eventName);
+
+        var event;
+
+        if(document.createEvent){
+            event = document.createEvent('HTMLEvents');
+            event.initEvent(eventName, true, true);
+            document.dispatchEvent(event);
+        }else{
+            event = document.createEventObject();
+            event.eventType = eventName;
+            document.fireEvent('on' + event.eventType, event);
+        }
+
+    }
 
 }
 
