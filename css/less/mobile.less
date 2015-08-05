@@ -2,6 +2,7 @@
 @width-remaining: 100% - 90%;
 @transition-time: 0.25s;
 @page-move-width: @move-width * -1;
+@close-menu-container-height: 80px;
 
 .mobile-transitions{
     .transition(all @transition-time ease-in-out);
@@ -45,30 +46,26 @@
     opacity: 1;
   }
 
-  #close-menu-container{
+  #close-menu-container {
+        width: 100%;
+        height: @close-menu-container-height;
+        text-align: right;
 
-    width:100%;
-    text-align: right;
-
-    i{
-
-      color: white;
-      height: 80px;
-      line-height: 80px;
-      width: 30%;
-      text-align: center;
-      font-size: 40px;
-
+        i {
+            color: white;
+            height: @close-menu-container-height;
+            line-height: @close-menu-container-height;
+            width: 30%;
+            text-align: center;
+            font-size: 40px;
+        }
     }
 
-  }
-
-  ul{
-
-    padding:0px 20px 20px 20px;
-    position: relative;
-    list-style: none;
-      height: 100%;
+    ul {
+        padding: 0px 20px 20px 20px;
+        position: relative;
+        list-style: none;
+        height: calc(~'100% - @{close-menu-container-height}');
 
     li{
 
