@@ -1,4 +1,4 @@
-//require('./lib/hammer.min.js');
+require('./lib/hammer.min.js');
 
 /********************
  *   Mobile Menu    *
@@ -18,7 +18,7 @@ var MobileMenu = function(settings)
         subMenuClass: 'sub-menu',
         subMenuOpenClass: 'open',
         doPagePush: false,
-        pageWrapperId: 'page-wrapper',
+        pageWrapperID: 'page-wrapper',
         pagePushClass: 'page-push',
         openMenuEvent: 'MobileMenuOpen',
         closeMenuEvent: 'MobileMenuClose',
@@ -41,6 +41,10 @@ var MobileMenu = function(settings)
     this.childMenuTriggers = document.getElementsByClassName(this.settings.childMenuTriggerClass);
     this.closeMenuTriggers = document.getElementsByClassName(this.settings.childMenuCloseClass);
     this.subMenus = document.getElementsByClassName(this.settings.subMenuClass);
+
+    if(this.settings.doPagePush){
+        this.pageWrapper = document.getElementById(this.settings.pageWrapperID);
+    }
 
     /* Returns menu to default state on close */
     this.resetMenu = function(){
@@ -101,7 +105,7 @@ var MobileMenu = function(settings)
                     var element = parent.childNodes[i];
 
                     if (element.className == _this.settings.subMenuClass) {
-                        element.classList.add('open');
+                        element.classList.add(_this.settings.subMenuOpenClass);
                     }
                 }
 
@@ -116,7 +120,7 @@ var MobileMenu = function(settings)
 
             trigger.addEventListener('click', function(){
                 var parent = this.parentNode.parentNode;
-                parent.classList.remove('open');
+                parent.classList.remove(_this.settings.subMenuOpenClass);
             });
         }
         /* /handle sub-menu triggers */
@@ -161,10 +165,9 @@ var MobileMenu = function(settings)
 
     this._bindListeners = function(){
 
-        var pageWrapper = document.getElementById(this.settings.pageWrapperId);
         var _this = this;
 
-        document.addEventListener('MobileMenuOpen', function(){
+        document.addEventListener(_this.settings.openMenuEvent, function(){
 
             _this.menuElement.classList.add(_this.settings.menuOpenClass);
 
@@ -176,7 +179,7 @@ var MobileMenu = function(settings)
 
         });
 
-        document.addEventListener('MobileMenuClose', function(){
+        document.addEventListener(_this.settings.closeMenuEvent, function(){
 
             _this.menuElement.classList.remove(_this.settings.menuOpenClass);
 
@@ -200,7 +203,7 @@ var MobileMenu = function(settings)
 
         var menuHammer = new Hammer(this.menuElement);
         /*var triggerHammer = new Hammer(this.menuElement);*/
-        var triggerHammer = new Hammer(document.elementByTagName('body'));
+        var triggerHammer = new Hammer(this.pageWrapper);
 
         /*menuHammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });*/
         triggerHammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
