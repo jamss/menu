@@ -2,22 +2,37 @@
  *   Mobile Menu    *
  ********************/
 
-var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
+var MobileMenu = function(settings)
 {
 
-    /* Elements: Dynamic */
-    this.triggerElement = document.getElementById(menuTriggerID);
-    this.menuElement = document.getElementById(menuContainerID);
+    this.settings = {
+        menuTriggerID: 'mobile-trigger',
+        menuContainerID: 'mobile-menu',
+        menuOpenClass: 'menu-open',
+        closeMenuId: 'close-menu',
+        childMenuTriggerClass: 'child-menu-trigger',
+        childMenuCloseClass: 'close-menu-trigger',
+        subMenuClass: 'sub-menu',
+        subMenuOpenClass: 'open',
+        doPagePush: false,
+        pageWrapperId: 'page-wrapper',
+        pagePushClass: 'page-push',
+        openMenuEvent: 'MobileMenuOpen',
+        closeMenuEvent: 'MobileMenuClose'
+    }
 
-    /* Elements: Static */
-    this.closeTriggerElement = document.getElementById('close-menu');
-    this.childMenuTriggers = document.getElementsByClassName('child-menu-trigger');
-    this.closeMenuTriggers = document.getElementsByClassName('close-menu-trigger');
-    this.subMenus = document.getElementsByClassName('sub-menu');
+    if(settings){
+        for(var key in settings){
+            this.settings[key] = settings[key];
+        }
+    }
 
-    /* Classes */
-    this.menuOpenClass = menuOpenClass !== null ? menuOpenClass : 'menu-open';
-
+    this.triggerElement = document.getElementById(this.settings.menuTriggerID);
+    this.menuElement = document.getElementById(this.settings.menuContainerID);
+    this.closeMenuTriggerElement = document.getElementById(this.settings.closeMenuId);
+    this.childMenuTriggers = document.getElementsByClassName(this.settings.childMenuTriggerClass);
+    this.closeMenuTriggers = document.getElementsByClassName(this.settings.childMenuCloseClass);
+    this.subMenus = document.getElementsByClassName(this.settings.subMenuClass);
 
     this.resetMenu = function(){
 
@@ -25,36 +40,12 @@ var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
 
             var menu = this.subMenus[i];
 
-            if(menu.classList.contains('open')){
-                menu.classList.remove('open');
+            if(menu.classList.contains(this.settings.subMenuOpenClass)){
+                menu.classList.remove(this.settings.subMenuOpenClass);
             }
 
         }
     }
-
-    /*this.createEvents = function(){
-
-        var menuOpenEvent, menuCloseEvent;
-
-        if(document.createEvent){
-
-            menuOpenEvent = document.createEvent('HTMLEvents');
-            menuOpenEvent.initEvent('MobileMenuOpen', true, true);
-
-            menuCloseEvent = document.createEvent('HTMLEvents');
-            menuCloseEvent.initEvent('MobileMenuClose', true, true);
-
-        }else{
-
-            menuOpenEvent = document.createEventObject();
-            menuOpenEvent.eventType = 'MobileMenuOpen';
-
-            menuCloseEvent = document.createEventObject();
-            menuCloseEvent.eventType = 'MobileMenuClose';
-
-        }
-
-    }*/
 
     this.bindEvents = function(){
 
@@ -69,32 +60,27 @@ var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
 
         this.triggerElement.addEventListener('click', function(){
 
-            if(_this.menuElement.classList.contains(_this.menuOpenClass))
-            {
+            if(_this.menuElement.classList.contains(_this.settings.menuOpenClass)){
                 //never executes
-                _this.fireEvent('MobileMenuClose');
-                _this.menuElement.classList.remove(_this.menuOpenClass);
+                _this._fireEvent(_this.settings.closeMenuEvent);
+                _this.menuElement.classList.remove(_this.settings.menuOpenClass);
                 _this.resetMenu();
             }else{
-                _this.fireEvent('MobileMenuOpen');
-                _this.menuElement.classList.add(_this.menuOpenClass);
+                _this._fireEvent(_this.settings.openMenuEvent);
+                _this.menuElement.classList.add(_this.settings.menuOpenClass);
             }
 
         });
 
-        this.closeTriggerElement.addEventListener('click', function(){
+        this.closeMenuTriggerElement.addEventListener('click', function(){
 
-            _this.fireEvent('MobileMenuClose');
-
-            if(_this.menuElement.classList.contains(_this.menuOpenClass))
-            {
-                /* todo: why this always executes */
-                _this.fireEvent('MobileMenuOpen');
-                _this.menuElement.classList.add(_this.menuOpenClass);
-            }else{
-                //never executes
-                _this.menuElement.classList.remove(_this.menuOpenClass);
+            if(_this.menuElement.classList.contains(_this.settings.menuOpenClass)) {
+                _this._fireEvent(_this.settings.closeMenuEvent);
+                _this.menuElement.classList.remove(_this.settings.menuOpenClass);
                 _this.resetMenu();
+            }else{
+                _this._fireEvent(_this.settings.openMenuEvent);
+                _this.menuElement.classList.add(_this.settings.menuOpenClass);
             }
 
         });
@@ -112,7 +98,7 @@ var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
 
                     var element = parent.childNodes[i];
 
-                    if (element.className == 'sub-menu') {
+                    if (element.className == _this.settings.subMenuClass) {
                         element.classList.add('open');
                     }
                 }
@@ -133,28 +119,25 @@ var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
         }
         /* /handle sub-menu triggers */
 
-        /*this.childMenuTriggers.forEach(function(trigger) {
-         trigger.addEventListener('click', function(){
-         alert('triggered');
-         });
-         });*/
 
         document.addEventListener('click', function(event){
 
-            if(event.target === _this.closeTriggerElement || event.target !== _this.menuElement && event.target !== _this.triggerElement && !(_this.menuElement.contains(event.target))){
-                if(_this.menuElement.classList.contains(_this.menuOpenClass))
+            if(event.target === _this.closeMenuTriggerElement || event.target !== _this.menuElement && event.target !== _this.triggerElement && !(_this.menuElement.contains(event.target))){
+                if(_this.menuElement.classList.contains(_this.settings.menuOpenClass))
                 {
-                    _this.menuElement.classList.remove(_this.menuOpenClass);
+                    _this._fireEvent(_this.settings.closeMenuEvent);
+                    _this.menuElement.classList.remove(_this.settings.menuOpenClass);
                 }
             }
 
         });
 
+       if(this.settings.doPagePush){
+           this._bindPagePushEvents();
+       }
     };
 
-    this.fireEvent = function(eventName){
-
-        console.log('dispatching: ' + 'on' + eventName);
+    this._fireEvent = function(eventName){
 
         var event;
 
@@ -167,6 +150,25 @@ var MobileMenu = function(menuTriggerID, menuContainerID, menuOpenClass)
             event.eventType = eventName;
             document.fireEvent('on' + event.eventType, event);
         }
+
+    }
+
+    this._bindPagePushEvents = function(){
+
+        var pageWrapper = document.getElementById(this.settings.pageWrapperId);
+        var _this = this;
+
+        document.addEventListener('MobileMenuOpen', function(){
+            if(!pageWrapper.classList.contains(_this.settings.pagePushClass)){
+                pageWrapper.classList.add(_this.settings.pagePushClass);
+            }
+        });
+
+        document.addEventListener('MobileMenuClose', function(){
+            if(pageWrapper.classList.contains(_this.settings.pagePushClass)){
+                pageWrapper.classList.remove(_this.settings.pagePushClass);
+            }
+        });
 
     }
 
