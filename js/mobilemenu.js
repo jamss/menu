@@ -1,4 +1,4 @@
-require('./lib/hammer.min.js');
+//require('./lib/hammer.min.js');
 
 /********************
  *   Mobile Menu    *
