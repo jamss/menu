@@ -1,4 +1,4 @@
-require('./lib/hammer.min.js');
+var Hammer = require('./lib/Hammer');
 
 /********************
  *   Mobile Menu    *
@@ -201,21 +201,41 @@ var MobileMenu = function(settings)
 
         var menu = this;
 
-        var menuHammer = new Hammer(this.menuElement);
-        /*var triggerHammer = new Hammer(this.menuElement);*/
-        var triggerHammer = new Hammer(this.pageWrapper);
+        if(this.menuElement){
 
-        /*menuHammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });*/
-        triggerHammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
-        menuHammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+            var menuHammer = new Hammer(this.menuElement);
 
-        menuHammer.on('panleft', function(ev){
-            menu._fireEvent(menu.settings.closeMenuEvent);
-        });
+            menuHammer.get('pan').set({
+                direction: Hammer.DIRECTION_HORIZONTAL,
+                threshold: 80
+            });
 
-        triggerHammer.on('panright', function(ev){
-            menu._fireEvent(menu.settings.openMenuEvent);
-        });
+            menuHammer.on('panleft', function(ev){
+                menu._fireEvent(menu.settings.closeMenuEvent);
+            });
+
+        }else{
+            console.log('menu element not found');
+        }
+
+        if(this.pageWrapper){
+
+            var wrapperHammer = new Hammer(this.pageWrapper);
+
+            wrapperHammer.get('pan').set({
+                direction: Hammer.DIRECTION_HORIZONTAL,
+                threshold: 80
+            });
+
+
+            wrapperHammer.on('panright', function(ev){
+                menu._fireEvent(menu.settings.openMenuEvent);
+            });
+
+        }else{
+            console.log(this.settings.pageWrapperID);
+            console.log('trigger element not found');
+        }
 
     }
 
