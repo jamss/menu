@@ -10,6 +10,7 @@ var MobileMenu = function(settings)
     /* Default settings */
     this.settings = {
         menuTriggerID: 'mobile-trigger',
+        searchTriggerID: 'search-trigger',
         menuContainerID: 'mobile-menu',
         menuOpenClass: 'menu-open',
         closeMenuID: 'close-menu',
@@ -36,6 +37,7 @@ var MobileMenu = function(settings)
 
     /* Elements */
     this.triggerElement = document.getElementById(this.settings.menuTriggerID);
+    this.searchElement = document.getElementById(this.settings.searchTriggerID);
     this.menuElement = document.getElementById(this.settings.menuContainerID);
     this.closeMenuTriggerElement = document.getElementById(this.settings.closeMenuID);
     this.childMenuTriggers = document.getElementsByClassName(this.settings.childMenuTriggerClass);
@@ -59,6 +61,14 @@ var MobileMenu = function(settings)
 
         }
     }
+    
+    this.toggleMenu = function(){
+        if(this.menuElement.classList.contains(this.settings.menuOpenClass)){
+            this._fireEvent(this.settings.closeMenuEvent);
+        }else{
+            this._fireEvent(this.settings.openMenuEvent);
+        }
+    }
 
     this.bindEvents = function(){
 
@@ -72,23 +82,11 @@ var MobileMenu = function(settings)
         var _this = this;
 
         this.triggerElement.addEventListener('click', function(){
-
-            if(_this.menuElement.classList.contains(_this.settings.menuOpenClass)){
-                _this._fireEvent(_this.settings.closeMenuEvent);
-            }else{
-                _this._fireEvent(_this.settings.openMenuEvent);
-            }
-
+            _this.toggleMenu();
         });
 
         this.closeMenuTriggerElement.addEventListener('click', function(){
-
-            if(_this.menuElement.classList.contains(_this.settings.menuOpenClass)) {
-                _this._fireEvent(_this.settings.closeMenuEvent);
-            }else{
-                _this._fireEvent(_this.settings.openMenuEvent);
-            }
-
+            _this.toggleMenu();
         });
 
         /* handle sub-menu triggers */
@@ -128,7 +126,7 @@ var MobileMenu = function(settings)
 
         document.addEventListener('click', function(event){
 
-            if(event.target === _this.closeMenuTriggerElement || event.target !== _this.menuElement && event.target !== _this.triggerElement && !(_this.menuElement.contains(event.target))){
+            if(event.target === _this.closeMenuTriggerElement || event.target !== _this.menuElement && event.target !== _this.triggerElement && event.target !== _this.searchElement && !(_this.menuElement.contains(event.target))){
                 if(_this.menuElement.classList.contains(_this.settings.menuOpenClass))
                 {
                     _this._fireEvent(_this.settings.closeMenuEvent);
@@ -214,8 +212,6 @@ var MobileMenu = function(settings)
                 menu._fireEvent(menu.settings.closeMenuEvent);
             });
 
-        }else{
-            console.log('menu element not found');
         }
 
         if(this.pageWrapper){
@@ -232,9 +228,6 @@ var MobileMenu = function(settings)
                 menu._fireEvent(menu.settings.openMenuEvent);
             });
 
-        }else{
-            console.log(this.settings.pageWrapperID);
-            console.log('trigger element not found');
         }
 
     }
