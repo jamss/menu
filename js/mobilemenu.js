@@ -10,10 +10,11 @@ var MobileMenu = function(settings)
     /* Default settings */
     this.settings = {
         menuTriggerID: 'mobile-trigger',
-        searchTriggerID: 'search-trigger',
+        menuTriggerClass: 'mobile-trigger',
         menuContainerID: 'mobile-menu',
         menuOpenClass: 'menu-open',
         closeMenuID: 'close-menu',
+        closeMenuClass: 'close-menu',
         childMenuTriggerClass: 'child-menu-trigger',
         childMenuCloseClass: 'close-menu-trigger',
         subMenuClass: 'sub-menu',
@@ -36,12 +37,17 @@ var MobileMenu = function(settings)
     }
 
     /* Elements */
-    this.triggerElement = document.getElementById(this.settings.menuTriggerID);
-    this.searchElement = document.getElementById(this.settings.searchTriggerID);
     this.menuElement = document.getElementById(this.settings.menuContainerID);
+
+    this.triggerElement = document.getElementById(this.settings.menuTriggerID);
     this.closeMenuTriggerElement = document.getElementById(this.settings.closeMenuID);
+
+    this.triggerElements = document.getElementsByClassName(this.settings.menuTriggerClass);
+    this.closeMenuTriggerElements = document.getElementsByClassName(this.settings.closeMenuClass);
+
     this.childMenuTriggers = document.getElementsByClassName(this.settings.childMenuTriggerClass);
     this.closeMenuTriggers = document.getElementsByClassName(this.settings.childMenuCloseClass);
+
     this.subMenus = document.getElementsByClassName(this.settings.subMenuClass);
 
     if(this.settings.doPagePush){
@@ -81,13 +87,19 @@ var MobileMenu = function(settings)
 
         var _this = this;
 
-        this.triggerElement.addEventListener('click', function(){
+        var toggleMenu = function(){
             _this.toggleMenu();
-        });
+        };
 
-        this.closeMenuTriggerElement.addEventListener('click', function(){
-            _this.toggleMenu();
-        });
+        this.triggerElement.addEventListener('click', toggleMenu);
+        this.closeMenuTriggerElement.addEventListener('click', toggleMenu);
+
+        for (var i = 0; i < this.triggerElements.length; i++) {
+            this.triggerElements[i].addEventListener('click', toggleMenu);
+        }
+        for (var i = 0; i < this.closeMenuTriggerElements.length; i++) {
+            this.closeMenuTriggerElements[i].addEventListener('click', toggleMenu);
+        }
 
         /* handle sub-menu triggers */
         for (var i = 0; i < this.childMenuTriggers.length; i++) {
@@ -117,8 +129,17 @@ var MobileMenu = function(settings)
             var trigger = this.closeMenuTriggers[i];
 
             trigger.addEventListener('click', function(){
-                var parent = this.parentNode.parentNode;
-                parent.classList.remove(_this.settings.subMenuOpenClass);
+
+                var element = this;
+                var parent = false;
+
+                while ((element = element.parentElement) && !element.classList.contains(_this.settings.subMenuClass)){
+                    parent = element;
+                }
+
+                if(parent){
+                    parent.classList.remove(_this.settings.subMenuOpenClass);
+                }
             });
         }
         /* /handle sub-menu triggers */
@@ -126,7 +147,7 @@ var MobileMenu = function(settings)
 
         document.addEventListener('click', function(event){
 
-            if(event.target === _this.closeMenuTriggerElement || event.target !== _this.menuElement && event.target !== _this.triggerElement && event.target !== _this.searchElement && !(_this.menuElement.contains(event.target))){
+            if(event.target === _this.closeMenuTriggerElement || event.target !== _this.menuElement && event.target !== _this.triggerElement && !(_this.menuElement.contains(event.target))){
                 if(_this.menuElement.classList.contains(_this.settings.menuOpenClass))
                 {
                     _this._fireEvent(_this.settings.closeMenuEvent);
