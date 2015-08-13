@@ -27,7 +27,7 @@ var MobileMenu = function(settings)
         swipeHandlers: true,
         bindCustomHandlers: false,
         retainMenuState: false,
-        menuOpenFrom: 'left'
+        excludeClickElements: []
     }
 
     /* Overwrite all settings passed into constructor */
@@ -156,7 +156,24 @@ var MobileMenu = function(settings)
 
         document.addEventListener('click', function(event){
 
-            if(event.target === _this.closeMenuTriggerElement || event.target !== _this.menuElement && event.target !== _this.triggerElement && !(_this.menuElement.contains(event.target))){
+            var close = true;
+
+            if(this.settings.excludeClickElements.length > 0){
+                for(var i; i < this.settings.excludeClickElements.length; i++){
+                    if(event.target == this.settings.excludeClickElements[i]){
+                        close = false;
+                    }
+                }
+            }
+
+            if(
+                close &&
+                (
+                    event.target === _this.closeMenuTriggerElement ||
+                    event.target !== _this.menuElement && event.target !== _this.triggerElement && !(_this.menuElement.contains(event.target))
+                )
+            )
+            {
                 if(_this.menuElement.classList.contains(_this.settings.menuOpenClass))
                 {
                     _this._fireEvent(_this.settings.closeMenuEvent);
@@ -231,8 +248,6 @@ var MobileMenu = function(settings)
 
         if(this.menuElement){
 
-            var closePan = 'pan' + (this.menuOpenFrom == 'left' ? 'left' : 'right');
-            
             var menuHammer = new Hammer(this.menuElement);
 
             menuHammer.get('pan').set({
@@ -240,7 +255,7 @@ var MobileMenu = function(settings)
                 threshold: 80
             });
 
-            menuHammer.on(closePan, function(ev){
+            menuHammer.on('panleft', function(ev){
                 menu._fireEvent(menu.settings.closeMenuEvent);
             });
 
@@ -248,8 +263,6 @@ var MobileMenu = function(settings)
 
         if(this.pageWrapper){
 
-            var openPan = 'pan' + (this.menuOpenFrom == 'left' ? 'right' : 'left');
-            
             var wrapperHammer = new Hammer(this.pageWrapper);
 
             wrapperHammer.get('pan').set({
@@ -258,7 +271,7 @@ var MobileMenu = function(settings)
             });
 
 
-            wrapperHammer.on(openPan, function(ev){
+            wrapperHammer.on('panright', function(ev){
                 menu._fireEvent(menu.settings.openMenuEvent);
             });
 
