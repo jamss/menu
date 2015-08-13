@@ -141,14 +141,12 @@ var MobileMenu = function(settings)
             trigger.addEventListener('click', function(){
 
                 var element = this;
-                var parent = false;
 
-                while ((element = element.parentNode) && !element.classList.contains(_this.settings.subMenuClass)){
-                    parent = element;
-                }
-
-                if(parent){
-                    parent.classList.remove(_this.settings.subMenuOpenClass);
+                while ((element = element.parentNode)){
+                    if(element.classList.contains(_this.settings.subMenuOpenClass)){
+                        element.classList.remove(_this.settings.subMenuOpenClass);
+                        break;
+                    }
                 }
             });
         }
