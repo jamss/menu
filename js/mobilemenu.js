@@ -91,14 +91,24 @@ var MobileMenu = function(settings)
             _this.toggleMenu();
         };
 
-        this.triggerElement.addEventListener('click', toggleMenu);
-        this.closeMenuTriggerElement.addEventListener('click', toggleMenu);
-
-        for (var i = 0; i < this.triggerElements.length; i++) {
-            this.triggerElements[i].addEventListener('click', toggleMenu);
+        if(this.triggerElement){
+            this.triggerElement.addEventListener('click', toggleMenu);
         }
-        for (var i = 0; i < this.closeMenuTriggerElements.length; i++) {
-            this.closeMenuTriggerElements[i].addEventListener('click', toggleMenu);
+
+        if(this.closeMenuTriggerElement){
+            this.closeMenuTriggerElement.addEventListener('click', toggleMenu);
+        }
+
+        if(this.triggerElements.length > 0){
+            for (var i = 0; i < this.triggerElements.length; i++) {
+                this.triggerElements[i].addEventListener('click', toggleMenu);
+            }
+        }
+
+        if(this.closeMenuTriggerElements.length > 0){
+            for (var i = 0; i < this.closeMenuTriggerElements.length; i++) {
+                this.closeMenuTriggerElements[i].addEventListener('click', toggleMenu);
+            }
         }
 
         /* handle sub-menu triggers */
@@ -133,7 +143,7 @@ var MobileMenu = function(settings)
                 var element = this;
                 var parent = false;
 
-                while ((element = element.parentElement) && !element.classList.contains(_this.settings.subMenuClass)){
+                while ((element = element.parentNode) && !element.classList.contains(_this.settings.subMenuClass)){
                     parent = element;
                 }
 
