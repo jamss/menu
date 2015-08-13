@@ -26,7 +26,8 @@ var MobileMenu = function(settings)
         closeMenuEvent: 'MobileMenuClose',
         swipeHandlers: true,
         bindCustomHandlers: false,
-        retainMenuState: false
+        retainMenuState: false,
+        menuOpenFrom: 'left'
     }
 
     /* Overwrite all settings passed into constructor */
@@ -230,6 +231,8 @@ var MobileMenu = function(settings)
 
         if(this.menuElement){
 
+            var closePan = 'pan' + (this.menuOpenFrom == 'left' ? 'left' : 'right');
+            
             var menuHammer = new Hammer(this.menuElement);
 
             menuHammer.get('pan').set({
@@ -237,7 +240,7 @@ var MobileMenu = function(settings)
                 threshold: 80
             });
 
-            menuHammer.on('panleft', function(ev){
+            menuHammer.on(closePan, function(ev){
                 menu._fireEvent(menu.settings.closeMenuEvent);
             });
 
@@ -245,6 +248,8 @@ var MobileMenu = function(settings)
 
         if(this.pageWrapper){
 
+            var openPan = 'pan' + (this.menuOpenFrom == 'left' ? 'right' : 'left');
+            
             var wrapperHammer = new Hammer(this.pageWrapper);
 
             wrapperHammer.get('pan').set({
@@ -253,7 +258,7 @@ var MobileMenu = function(settings)
             });
 
 
-            wrapperHammer.on('panright', function(ev){
+            wrapperHammer.on(openPan, function(ev){
                 menu._fireEvent(menu.settings.openMenuEvent);
             });
 
