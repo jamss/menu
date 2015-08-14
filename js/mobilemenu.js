@@ -158,10 +158,11 @@ var MobileMenu = function(settings)
 
             var close = true;
 
-            if(this.settings.excludeClickElements.length > 0){
-                for(var i; i < this.settings.excludeClickElements.length; i++){
-                    if(event.target == this.settings.excludeClickElements[i]){
+            if(_this.settings.excludeClickElements.length > 0){
+                for(var i = 0; i < _this.settings.excludeClickElements.length; i++){
+                    if(event.target == _this.settings.excludeClickElements[i]){
                         close = false;
+                        break;
                     }
                 }
             }
