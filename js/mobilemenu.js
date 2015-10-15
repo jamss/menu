@@ -4,8 +4,7 @@ var Hammer = require('./lib/Hammer');
  *   Mobile Menu    *
  ********************/
 
-var MobileMenu = function(settings)
-{
+var MobileMenu = function(settings) {
 
     /* Default settings */
     this.settings = {
@@ -31,8 +30,8 @@ var MobileMenu = function(settings)
     }
 
     /* Overwrite all settings passed into constructor */
-    if(settings){
-        for(var key in settings){
+    if (settings) {
+        for (var key in settings) {
             this.settings[key] = settings[key];
         }
     }
@@ -51,62 +50,62 @@ var MobileMenu = function(settings)
 
     this.subMenus = document.getElementsByClassName(this.settings.subMenuClass);
 
-    if(this.settings.doPagePush){
+    if (this.settings.doPagePush) {
         this.pageWrapper = document.getElementById(this.settings.pageWrapperID);
     }
 
     /* Returns menu to default state on close */
-    this.resetMenu = function(){
+    this.resetMenu = function() {
 
         for (var i = 0; i < this.subMenus.length; i++) {
 
             var menu = this.subMenus[i];
 
-            if(menu.classList.contains(this.settings.subMenuOpenClass)){
+            if (menu.classList.contains(this.settings.subMenuOpenClass)) {
                 menu.classList.remove(this.settings.subMenuOpenClass);
             }
 
         }
     }
-    
-    this.toggleMenu = function(){
-        if(this.menuElement.classList.contains(this.settings.menuOpenClass)){
+
+    this.toggleMenu = function() {
+        if (this.menuElement.classList.contains(this.settings.menuOpenClass)) {
             this._fireEvent(this.settings.closeMenuEvent);
-        }else{
+        } else {
             this._fireEvent(this.settings.openMenuEvent);
         }
     }
 
-    this.bindEvents = function(){
+    this.bindEvents = function() {
 
-        if(typeof this.triggerElement === 'undefined'){
+        if (typeof this.triggerElement === 'undefined') {
             console.log('Bad trigger element');
         }
-        if(typeof this.menuElement === 'undefined'){
+        if (typeof this.menuElement === 'undefined') {
             console.log('Bad container element');
         }
 
         var _this = this;
 
-        var toggleMenu = function(){
+        var toggleMenu = function() {
             _this.toggleMenu();
         };
 
-        if(this.triggerElement){
+        if (this.triggerElement) {
             this.triggerElement.addEventListener('click', toggleMenu);
         }
 
-        if(this.closeMenuTriggerElement){
+        if (this.closeMenuTriggerElement) {
             this.closeMenuTriggerElement.addEventListener('click', toggleMenu);
         }
 
-        if(this.triggerElements.length > 0){
+        if (this.triggerElements.length > 0) {
             for (var i = 0; i < this.triggerElements.length; i++) {
                 this.triggerElements[i].addEventListener('click', toggleMenu);
             }
         }
 
-        if(this.closeMenuTriggerElements.length > 0){
+        if (this.closeMenuTriggerElements.length > 0) {
             for (var i = 0; i < this.closeMenuTriggerElements.length; i++) {
                 this.closeMenuTriggerElements[i].addEventListener('click', toggleMenu);
             }
@@ -117,7 +116,7 @@ var MobileMenu = function(settings)
 
             var trigger = this.childMenuTriggers[i];
 
-            trigger.addEventListener('click', function(){
+            trigger.addEventListener('click', function() {
 
                 var parent = this.parentNode;
 
@@ -126,6 +125,7 @@ var MobileMenu = function(settings)
                     var element = parent.childNodes[i];
 
                     if (element.className == _this.settings.subMenuClass) {
+                        _this.menuElement.scrollTop = 0;
                         element.classList.add(_this.settings.subMenuOpenClass);
                     }
                 }
@@ -139,12 +139,13 @@ var MobileMenu = function(settings)
 
             var trigger = this.closeMenuTriggers[i];
 
-            trigger.addEventListener('click', function(){
+            trigger.addEventListener('click', function() {
 
                 var element = this;
 
-                while ((element = element.parentNode)){
-                    if(element.classList.contains(_this.settings.subMenuOpenClass)){
+                while ((element = element.parentNode)) {
+                    if (element.classList.contains(_this.settings.subMenuOpenClass)) {
+                        _this.menuElement.scrollTop = 0;
                         element.classList.remove(_this.settings.subMenuOpenClass);
                         break;
                     }
@@ -154,29 +155,32 @@ var MobileMenu = function(settings)
         /* /handle sub-menu triggers */
 
 
-        document.addEventListener('click', function(event){
+        document.addEventListener('click', function(event) {
 
             var close = true;
 
-            if(_this.settings.excludeClickElements.length > 0){
-                for(var i = 0; i < _this.settings.excludeClickElements.length; i++){
-                    if(event.target == _this.settings.excludeClickElements[i]){
-                        close = false;
-                        break;
+            if (_this.settings.excludeClickElements.length > 0) {
+                for (var i = 0; i < _this.settings.excludeClickElements.length; i++) {
+                    if(_this.settings.excludeClickElements[i].length > 0){
+                        for (var j = 0; j < _this.settings.excludeClickElements[i].length; j++) {
+                            if (event.target == _this.settings.excludeClickElements[i][j]) {
+                                close = false;
+                                break;
+                            }
+                        }
                     }
                 }
             }
 
-            if(
+            if (
                 close &&
                 (
                     event.target === _this.closeMenuTriggerElement ||
-                    event.target !== _this.menuElement && event.target !== _this.triggerElement && !(_this.menuElement.contains(event.target))
+                    event.target !== _this.menuElement && event.target !== _this.triggerElement && !(_this.menuElement.contains(event.target)) /*||
+                    event.target.classList.contains(_this.settings.menuTriggerClass)*/
                 )
-            )
-            {
-                if(_this.menuElement.classList.contains(_this.settings.menuOpenClass))
-                {
+            ) {
+                if (_this.menuElement.classList.contains(_this.settings.menuOpenClass)) {
                     _this._fireEvent(_this.settings.closeMenuEvent);
                     _this.menuElement.classList.remove(_this.settings.menuOpenClass);
                 }
@@ -184,24 +188,24 @@ var MobileMenu = function(settings)
 
         });
 
-        if(!this.settings.bindCustomHandlers){
+        if (!this.settings.bindCustomHandlers) {
             this._bindListeners();
         }
 
-        if(this.settings.swipeHandlers){
+        if (this.settings.swipeHandlers) {
             this._bindSwipeEvents();
         }
     };
 
-    this._fireEvent = function(eventName){
+    this._fireEvent = function(eventName) {
 
         var event;
 
-        if(document.createEvent){
+        if (document.createEvent) {
             event = document.createEvent('HTMLEvents');
             event.initEvent(eventName, true, true);
             document.dispatchEvent(event);
-        }else{
+        } else {
             event = document.createEventObject();
             event.eventType = eventName;
             document.fireEvent('on' + event.eventType, event);
@@ -209,32 +213,32 @@ var MobileMenu = function(settings)
 
     }
 
-    this._bindListeners = function(){
+    this._bindListeners = function() {
 
         var _this = this;
 
-        document.addEventListener(_this.settings.openMenuEvent, function(){
+        document.addEventListener(_this.settings.openMenuEvent, function() {
 
             _this.menuElement.classList.add(_this.settings.menuOpenClass);
 
-            if(_this.settings.doPagePush){
-                if(!_this.pageWrapper.classList.contains(_this.settings.pagePushClass)){
+            if (_this.settings.doPagePush) {
+                if (!_this.pageWrapper.classList.contains(_this.settings.pagePushClass)) {
                     _this.pageWrapper.classList.add(_this.settings.pagePushClass);
                 }
             }
 
         });
 
-        document.addEventListener(_this.settings.closeMenuEvent, function(){
+        document.addEventListener(_this.settings.closeMenuEvent, function() {
 
             _this.menuElement.classList.remove(_this.settings.menuOpenClass);
 
-            if(!_this.settings.retainMenuState){
+            if (!_this.settings.retainMenuState) {
                 _this.resetMenu();
             }
 
-            if(_this.settings.doPagePush){
-                if(_this.pageWrapper.classList.contains(_this.settings.pagePushClass)){
+            if (_this.settings.doPagePush) {
+                if (_this.pageWrapper.classList.contains(_this.settings.pagePushClass)) {
                     _this.pageWrapper.classList.remove(_this.settings.pagePushClass);
                 }
             }
@@ -243,36 +247,36 @@ var MobileMenu = function(settings)
 
     }
 
-    this._bindSwipeEvents = function(){
+    this._bindSwipeEvents = function() {
 
         var menu = this;
 
-        if(this.menuElement){
+        if (this.menuElement) {
 
             var menuHammer = new Hammer(this.menuElement);
 
             menuHammer.get('pan').set({
                 direction: Hammer.DIRECTION_HORIZONTAL,
-                threshold: 80
+                threshold: 200
             });
 
-            menuHammer.on('panleft', function(ev){
+            menuHammer.on('panleft', function(ev) {
                 menu._fireEvent(menu.settings.closeMenuEvent);
             });
 
         }
 
-        if(this.pageWrapper){
+        if (this.pageWrapper) {
 
             var wrapperHammer = new Hammer(this.pageWrapper);
 
             wrapperHammer.get('pan').set({
                 direction: Hammer.DIRECTION_HORIZONTAL,
-                threshold: 80
+                threshold: 200
             });
 
 
-            wrapperHammer.on('panright', function(ev){
+            wrapperHammer.on('panright', function(ev) {
                 menu._fireEvent(menu.settings.openMenuEvent);
             });
 
